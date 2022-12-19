@@ -1,0 +1,32 @@
+from flask import Flask, jsonify
+import mysql.connector
+
+app = Flask(__name__)
+
+# Connect to the database
+cnx = mysql.connector.connect(user='<username>', password='<password>',
+                              host='<hostname>', database='<database>')
+
+# Create a cursor to interact with the database
+cursor = cnx.cursor()
+
+@app.route('/api/users')
+def get_users():
+    # Query the database for a list of users
+    cursor.execute('SELECT * FROM users')
+    # Fetch the results of the query
+    users = cursor.fetchall()
+    # Convert the results to a list of dictionaries
+    users_list = []
+    for user in users:
+        user_dict = {
+            'id': user[0],
+            'name': user[1],
+            'email': user[2]
+        }
+        users_list.append(user_dict)
+    # Return the list of dictionaries as a JSON response
+    return jsonify(users_list)
+
+if __name__ == '__main__':
+    app.run()
